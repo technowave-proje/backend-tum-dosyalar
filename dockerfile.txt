@@ -1,0 +1,22 @@
+# Resmi Python image kullanıyoruz
+FROM python:3.11-slim
+
+# Çalışma klasörü oluştur
+WORKDIR /app
+
+# Sistem bağımlılıklarını yükle (netCDF4 için libhdf5 gerekir)
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libhdf5-dev \
+    libnetcdf-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python bağımlılıklarını yükle
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Proje dosyalarını kopyala
+COPY . .
+
+# FastAPI uygulamasını başlat
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

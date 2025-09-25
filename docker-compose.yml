@@ -1,0 +1,61 @@
+version: "3.9"
+# Docker Compose dosya formatının sürümünü belirtir.
+# 3.9, en güncel ve modern Compose sürümlerinden biridir.
+
+services:
+# Burada birden fazla servis (container) tanımlanır.
+# Bizim projemizde iki servis var: db (MySQL veritabanı) ve backend (FastAPI uygulaması).
+
+  db:
+    image: mysql:8.0
+    # db adında bir servis tanımlıyoruz.
+    # Bunun için Docker Hub’daki resmi MySQL 8.0 imajını kullanıyoruz.
+    container_name: aq-mysql
+    # Container’ın ismi aq-mysql olacak (rastgele isim yerine sabit isim).
+    restart: always
+    # Container çökerse/durdurulursa otomatik yeniden başlasın.
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: airquality
+      MYSQL_USER: aquser
+      MYSQL_PASSWORD: aqpass
+      # Ortam değişkenleri (env variables) ile MySQL kurulumu yapılır:
+      # MYSQL_ROOT_PASSWORD: root kullanıcısının şifresi.
+      # MYSQL_DATABASE: container ilk çalıştığında otomatik oluşturulacak veritabanı (airquality).
+      # MYSQL_USER: yeni kullanıcı adı (aquser).
+      # MYSQL_PASSWORD: bu kullanıcıya ait şifre (aqpass).
+    ports:
+      - "3306:3306"
+      # Host makinenin 3306 portunu, container’daki 3306 portuna bağlar.
+      # Böylece bilgisayarından (ör. MySQL Workbench, DBeaver) localhost:3306 üzerinden bağlanabilirsin.
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # MySQL’in verileri container silinse bile kaybolmasın diye Docker Volume kullanılır.
+      # mysql_data isimli volume, container içindeki /var/lib/mysql klasörüne bağlanır.
+
+  backend:
+    build: .
+    # backend adında bir servis tanımlıyoruz.
+    # build: . → Bulunduğumuz klasördeki Dockerfile kullanılarak backend imajı oluşturulur.
+    container_name: aq-backend
+    # Container’ın ismi aq-backend olacak.
+    restart: always
+    # Backend çökerse/durdurulursa otomatik yeniden başlasın.
+    env_file: .env
+    # .env dosyasındaki ortam değişkenlerini (ör. AIRNOW_API_KEY, OPENWEATHER_API_KEY, DATABASE_URL vs.) backend container’ına yükler.
+    depends_on:
+      - db
+      # Bu servis db servisine bağımlıdır → yani önce db başlatılır, sonra backend ayağa kalkar.
+    ports:
+      - "8000:8000"
+      # Host makinedeki 8000 portunu, container içindeki 8000 portuna bağlar.
+      # Yani tarayıcıdan http://localhost:8000 ile FastAPI’ye ulaşabilirsin.
+    volumes:
+      - .:/app
+      # Host’taki proje klasörünü (.), container içindeki /app klasörüne mount eder.
+      # Böylece kodunu değiştirince container içinde de anında değişiklik olur (hot reload).
+
+volumes:
+  mysql_data:
+# Burada mysql_data isimli volume tanımlanıyor.
+# Bu volume, db servisi tarafından MySQL verilerini kalıcı saklamak için kullanılıyor.

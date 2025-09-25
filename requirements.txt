@@ -1,0 +1,43 @@
+# Web framework
+fastapi
+uvicorn[standard]
+
+# Database ORM
+SQLAlchemy>=1.4
+pymysql
+
+alembic
+
+# Environment variables
+python-dotenv
+pydantic
+
+# NASA Earthdata
+earthaccess
+netCDF4
+xarray
+numpy
+
+# External APIs
+requests
+
+# Scheduler
+apscheduler
+
+# ML integration
+joblib
+pandas
+
+# CORS ve dosya upload için
+python-multipart
+
+pydantic>=2.0
+pydantic-settings>=2.0
+
+# ML modelini eğitmek için lazım olur. Eğer sadece tahmin yapmak için hazır pickle dosyası kullanacaksan gerek olmayabilir.
+scikit-learn
+
+# lokasyon verilerini harita üzerinde göstermek istersen faydalı, ama zorunlu değil.
+geojson
+
+#Eğer ML tarafını bu backend içinde de geliştireceksen scikit-learn ekle. Eğer sadece önceden eğittiğin modeli pickle ile yükleyeceksen gerek yok. geojson zorunlu değil, opsiyonel.
